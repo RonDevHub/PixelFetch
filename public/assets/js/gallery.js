@@ -5,40 +5,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const lightboxDesc = document.getElementById('lightbox-desc');
     const lightboxLikes = document.getElementById('lightbox-likes');
     const lightboxComments = document.getElementById('lightbox-comments');
+    const lightboxPermalink = document.getElementById('lightbox-permalink');
     const closeBtn = document.getElementById('close-btn');
+
+    if (!lightbox || !lightboxImg || !lightboxDesc || !lightboxLikes || !lightboxComments || !lightboxPermalink) {
+        console.error('PixelFetch: Lightbox-Elemente im DOM nicht gefunden.');
+        return;
+    }
 
     galleryItems.forEach(item => {
         item.addEventListener('click', () => {
             const imgSrc = item.getAttribute('data-img');
-            const desc = item.getAttribute('data-desc') || 'Keine Beschreibung vorhanden.';
-            const likes = item.getAttribute('data-likes');
-            const comments = item.getAttribute('data-comments');
+            const desc = item.getAttribute('data-desc') || '';
+            const likes = item.getAttribute('data-likes') || '0';
+            const comments = item.getAttribute('data-comments') || '0';
+            const permalink = item.getAttribute('data-permalink') || '#';
 
             lightboxImg.src = imgSrc;
-            lightboxDesc.textContent = desc; // TextContent verhindert HTML-Injection
+            lightboxDesc.textContent = desc;
             lightboxLikes.textContent = likes;
             lightboxComments.textContent = comments;
+            lightboxPermalink.href = permalink;
 
-            lightbox.classList.add('active');
+            lightbox.style.display = 'flex';
         });
     });
 
     const closeLightbox = () => {
-        lightbox.classList.remove('active');
+        lightbox.style.display = 'none';
         lightboxImg.src = '';
+        lightboxDesc.textContent = '';
+        lightboxPermalink.href = '#';
     };
 
-    closeBtn.addEventListener('click', closeLightbox);
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeLightbox);
+    }
+
     lightbox.addEventListener('click', (e) => {
         if (e.target === lightbox) {
             closeLightbox();
         }
     });
 
-    // ESC-Taste zum Schließen
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        if (e.key === 'Escape' && lightbox.style.display === 'flex') {
             closeLightbox();
+        }
+    });
+
+    window.addEventListener('message', (event) => {
+        if (event.data && typeof event.data === 'object' && event.data.type === 'SET_PIXELFETCH_THEME') {
+            const targetTheme = event.data.theme;
+            if (['light', 'dark', 'auto'].includes(targetTheme)) {
+                document.documentElement.setAttribute('data-theme', targetTheme);
+            }
         }
     });
 });

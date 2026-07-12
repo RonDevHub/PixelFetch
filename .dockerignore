@@ -3,6 +3,7 @@
 .gitignore
 .github
 .woodpecker
+.view
 
 # Docker & local dev
 docker-compose.yml
