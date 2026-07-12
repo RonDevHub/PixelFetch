@@ -47,8 +47,9 @@ services:
     ports:
       - "8080:80"
     environment:
-      - THEME_MODE=auto
-      - DEFAULT_CACHE_TTL=3600
+      - THEME_MODE=auto # Theme-Modus für die Galerie: auto (System-Standard), light (hell), dark (dunkel)
+      - DEFAULT_CACHE_TTL=3600 # Standard Cache-Dauer in Sekunden (3600 = 1 Stunde), falls im Account nichts definiert ist
+      - DISABLE_DOCS=false # Dokumentation und Vorschau auf index.php deaktivieren (true/false)
     volumes:
       - ./storage:/var/www/html/storage
       - ./config:/var/www/html/config
