@@ -1,12 +1,12 @@
 # PixelFetch
 
-PixelFetch ist eine minimalistische, extrem ressourcensparende und zu 100% datenschutzkonforme Multi-Account-Galerie für Pixelfeed. Das Skript nutzt ein automatisiertes **Lazy Caching Verfahren** und läuft sowohl auf klassischem Webspace (wie All-Inkl.com) als auch containerisiert in Docker-Umgebungen.
+PixelFetch ist eine minimalistische, extrem ressourcensparende und zu 100% datenschutzkonforme Multi-Account-Galerie für Pixelfed. Das Skript nutzt ein automatisiertes **Lazy Caching Verfahren** und läuft sowohl auf klassischem Webspace (wie All-Inkl.com) als auch containerisiert in Docker-Umgebungen.
 
 ## Features
 
-- **Multi-Account:** Verwalte unbegrenzt viele Pixelfeed-Accounts (auch von unterschiedlichen Instanzen) über eine zentrale Installation.
+- **Multi-Account:** Verwalte unbegrenzt viele Pixelfed-Accounts (auch von unterschiedlichen Instanzen) über eine zentrale Installation.
 - **Lazy Caching:** Die Daten und Bilder werden nur aktualisiert, wenn die Galerie tatsächlich besucht wird und der Cache abgelaufen ist. Keine störenden Cronjobs im Hintergrund nötig.
-- **100% DSGVO-konform:** Bilder werden lokal auf deinen Server geladen. Die Browser deiner Webseitenbesucher kommunizieren niemals mit fremden Pixelfeed-Instanzen. Keine IP-Leaks.
+- **100% DSGVO-konform:** Bilder werden lokal auf deinen Server geladen. Die Browser deiner Webseitenbesucher kommunizieren niemals mit fremden Pixelfed-Instanzen. Keine IP-Leaks.
 - **Zero Dependencies:** Reines PHP ohne dicke Composer-Pakete. CSS und JS sind nativ (Vanilla).
 - **Automatischer Dark-Mode:** Erkennt die Systemeinstellungen des Nutzers oder lässt sich global erzwingen.
 
@@ -15,7 +15,7 @@ PixelFetch ist eine minimalistische, extrem ressourcensparende und zu 100% daten
 1. Kopiere den gesamten Inhalt dieses Repositories in ein Verzeichnis auf deinem Server.
 2. Route deine Domain/Subdomain zwingend in den Unterordner `/public`.
 3. Kopiere die Datei `.env.example` zu `.env` und passe die Werte an.
-4. Kopiere die Datei `config/accounts.json.example` zu `config/accounts.json` und trage dort deine Pixelfeed-Instanzen und dazugehörigen Personal Access Tokens (PAT) ein.
+4. Kopiere die Datei `config/accounts.json.example` zu `config/accounts.json` und trage dort deine Pixelfed-Instanzen und dazugehörigen Personal Access Tokens (PAT) ein.
 5. Stelle sicher, dass der Ordner `/storage` für den Webserver beschreibbar ist (`CHMOD 755` oder `777`).
 
 ## Installation via Docker
