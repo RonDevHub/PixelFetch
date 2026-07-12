@@ -23,10 +23,11 @@ WORKDIR /var/www/html
 # Dateien in den Container spiegeln
 COPY . /var/www/html
 
-# Apache-Konfiguration anpassen: DocumentRoot auf /public setzen und Module laden
+# Apache-Konfiguration anpassen: DocumentRoot auf /public setzen, Module laden und ServerName-Warnung fixen
 RUN sed -i 's|"/var/www/localhost/htdocs"|"/var/www/html/public"|g' /etc/apache2/httpd.conf \
     && sed -i 's|AllowOverride None|AllowOverride All|g' /etc/apache2/httpd.conf \
-    && sed -i 's|#LoadModule rewrite_module|LoadModule rewrite_module|g' /etc/apache2/httpd.conf
+    && sed -i 's|#LoadModule rewrite_module|LoadModule rewrite_module|g' /etc/apache2/httpd.conf \
+    && echo "ServerName localhost" >> /etc/apache2/httpd.conf
 
 # Schreibrechte für den Lazy Cache an den Alpine Apache-User übergeben
 RUN mkdir -p /var/www/html/storage && chown -R apache:apache /var/www/html/storage
