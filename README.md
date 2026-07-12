@@ -1,4 +1,15 @@
-# PixelFetch
+<h1 align="center">
+  <img src="https://commitcloud.net/RonDevHub/PixelFetch/raw/commit/84e81193383f76582b52df0b7d4a5199e6d2c1bf/public/assets/logo/Pixelfetch-1.png" height="100">
+</h1>
+<div align="center">
+
+![Created](https://mini-badges.rondev.de/forgejo/RonDevHub/PixelFetch/created-at/*/*/en) ![GitHub Repo stars](https://mini-badges.rondev.de/forgejo/RonDevHub/PixelFetch/lastcommit/*/*/en) ![GitHub Repo stars](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/stars/*/*/en) ![GitHub Repo stars](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/issues/*/*/en) ![GitHub Repo language](https://mini-badges.rondev.de/forgejo/RonDevHub/PixelFetch/language/*/*/en) ![GitHub Repo license](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/license/*/*/en) ![GitHub Repo release](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/release/*/*/en) ![GitHub Repo release](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/forks/*/*/en) ![GitHub Repo downlods](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/downloads/*/*/en) ![GitHub Repo stars](https://mini-badges.rondev.de/github/RonDevHub/PixelFetch/watchers) [![status-badge](https://ci.commitcloud.net/api/badges/13/status.svg)](https://ci.commitcloud.net/repos/15) 
+
+[![Buy me a coffee](https://mini-badges.rondev.de/icon/cuptogo/Buy_me_a_Coffee-c1d82f-222/for-the-badge "Buy me a coffee")](https://www.buymeacoffee.com/RonDev)
+[![Buy me a coffee](https://mini-badges.rondev.de/icon/cuptogo/ko--fi.com-c1d82f-222/for-the-badge "Buy me a coffee")](https://ko-fi.com/U6U31EV2VS)
+[![Pizza Power](https://mini-badges.rondev.de/icon/paypal/PayPal/for-the-badge "Pizza Power")](https://www.paypal.com/donate/?hosted_button_id=PWY939TPCQ3RA)
+</div>
+<hr>
 
 PixelFetch ist eine minimalistische, extrem ressourcensparende und zu 100% datenschutzkonforme Multi-Account-Galerie für Pixelfed. Das Skript nutzt ein automatisiertes **Lazy Caching Verfahren** und läuft sowohl auf klassischem Webspace (wie All-Inkl.com) als auch containerisiert in Docker-Umgebungen.
 
