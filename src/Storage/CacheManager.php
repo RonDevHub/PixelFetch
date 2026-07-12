@@ -18,19 +18,16 @@ class CacheManager
     {
         $this->userKey = $userKey;
         $this->accountConfig = $accountConfig;
-        
+
         $baseStorage = dirname(__DIR__, 2) . '/storage/cache/' . $userKey;
         $this->cacheDir = $baseStorage;
         $this->metaFile = $baseStorage . '/meta.json';
         $this->imageDir = $baseStorage . '/images';
     }
 
-    /**
-     * Gibt die Galerie-Daten zurück. Triggert das Lazy Update, falls der Cache abgelaufen ist.
-     */
     public function getGalleryData(): array
     {
-        $ttl = $this->accountConfig['cache_ttl'] ?? (int)Config::get('DEFAULT_CACHE_TTL', 3600);
+        $ttl = isset($this->accountConfig['cache_ttl']) ? (int)$this->accountConfig['cache_ttl'] : (int)Config::get('DEFAULT_CACHE_TTL', 3600);
 
         if ($this->isCacheExpired($ttl)) {
             $this->refreshCache();
@@ -44,34 +41,34 @@ class CacheManager
         return [];
     }
 
-    /**
-     * Prüft, ob die Metadaten-Datei fehlt oder ihr Alter die TTL überschreitet
-     */
     private function isCacheExpired(int $ttl): bool
     {
         if (!file_exists($this->metaFile)) {
             return true;
         }
 
-        return (time() - file_mtime($this->metaFile)) > $ttl;
+        return (time() - filemtime($this->metaFile)) > $ttl;
     }
 
-    /**
-     * Holt frische Daten via API, lädt neue Bilder herunter und bereinigt alte Dateien
-     */
     private function refreshCache(): void
     {
         if (!is_dir($this->imageDir)) {
-            mkdir($this->imageDir, 0755, true);
+            if (!@mkdir($this->imageDir, 0755, true) && !is_dir($this->imageDir)) {
+                error_log("PixelFetch Error: Verzeichnis konnte nicht erstellt werden: " . $this->imageDir);
+                return;
+            }
         }
 
-        $manager = new AccountManager($this->userKey, $this->accountConfig);
-        $posts = $manager->fetchLatestPosts(24); // Standardmäßig 24 Bilder holen
+        // Limit ermitteln: Account-Ebene -> ENV-Variable -> Standardwert
+        $limitSetting = isset($this->accountConfig['max_pictures']) ? $this->accountConfig['max_pictures'] : Config::get('MAX_PICTURES', 24);
+        $fetchLimit = ($limitSetting === 'all') ? 100 : (int)$limitSetting;
 
-        if ($posts === null) {
-            // Bei API-Fehlern behalten wir den alten Cache als Fallback und aktualisieren nur den Zeitstempel
+        $manager = new AccountManager($this->userKey, $this->accountConfig);
+        $posts = $manager->fetchLatestPosts($fetchLimit);
+
+        if ($posts === null || !is_array($posts)) {
             if (file_exists($this->metaFile)) {
-                touch($this->metaFile);
+                @touch($this->metaFile);
             }
             return;
         }
@@ -79,57 +76,72 @@ class CacheManager
         $processedPosts = [];
         $activeImageFiles = [];
 
+        // Avatar-URL aus dem ersten Post-Datensatz extrahieren (falls vorhanden)
+        $avatarUrl = '';
+        $profileUrl = '';
+        $displayName = $this->accountConfig['username'];
+
+        if (!empty($posts) && isset($posts[0]['account'])) {
+            $avatarUrl = isset($posts[0]['account']['avatar']) ? $posts[0]['account']['avatar'] : '';
+            $profileUrl = isset($posts[0]['account']['url']) ? $posts[0]['account']['url'] : '';
+            $displayName = isset($posts[0]['account']['display_name']) && !empty($posts[0]['account']['display_name']) ? $posts[0]['account']['display_name'] : $posts[0]['account']['username'];
+        }
+
         foreach ($posts as $post) {
-            // Nur Beiträge mit Medien (Bilder) verarbeiten
-            if (empty($post['media_attachments'])) {
+            if (!is_array($post) || empty($post['media_attachments']) || !is_array($post['media_attachments'])) {
                 continue;
             }
 
             $media = $post['media_attachments'][0];
-            if ($media['type'] !== 'image') {
+            if (!isset($media['type']) || $media['type'] !== 'image' || empty($media['url'])) {
                 continue;
             }
 
-            // Sicheren lokalen Dateinamen generieren (SHA256 der Remote-URL zum Schutz vor Injection)
             $remoteUrl = $media['url'];
             $extension = pathinfo(parse_url($remoteUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
             $localFilename = hash('sha256', $remoteUrl) . '.' . $extension;
             $localPath = $this->imageDir . '/' . $localFilename;
 
-            // Falls das Bild noch nicht lokal existiert, herunterladen
             if (!file_exists($localPath)) {
-                HttpClient::downloadFile($remoteUrl, $localPath);
+                if (!HttpClient::downloadFile($remoteUrl, $localPath)) {
+                    error_log("PixelFetch Error: Bild-Download fehlgeschlagen von: " . $remoteUrl);
+                    continue;
+                }
             }
 
-            // Datei als aktiv registrieren, damit sie nicht gelöscht wird
             if (file_exists($localPath)) {
                 $activeImageFiles[] = $localFilename;
-
-                // Strip HTML-Tags aus der Beschreibung für sichere Plaintext-Ausgabe
-                $description = $post['content'] ? strip_tags($post['content']) : '';
+                $description = isset($post['content']) ? strip_tags($post['content']) : '';
 
                 $processedPosts[] = [
-                    'id' => $post['id'],
-                    'url' => $post['url'], // Link zum Originalbeitrag auf Pixelfeed
+                    'id' => isset($post['id']) ? $post['id'] : uniqid(),
+                    'url' => isset($post['url']) ? $post['url'] : '#',
                     'local_image' => $localFilename,
                     'description' => trim($description),
-                    'likes' => (int)($post['favourites_count'] ?? 0),
-                    'comments' => (int)($post['replies_count'] ?? 0),
-                    'created_at' => $post['created_at']
+                    'likes' => (int)(isset($post['favourites_count']) ? $post['favourites_count'] : 0),
+                    'comments' => (int)(isset($post['replies_count']) ? $post['replies_count'] : 0),
+                    'created_at' => isset($post['created_at']) ? $post['created_at'] : date('c')
                 ];
             }
         }
 
-        // Metadaten-Datei atomar schreiben
-        file_put_contents($this->metaFile, json_encode($processedPosts, JSON_PRETTY_PRINT));
+        // Profildaten oben in das JSON-Array injizieren, um sie im Frontend verfügbar zu machen
+        $outputData = [
+            'account_meta' => [
+                'avatar_url' => $avatarUrl,
+                'profile_url' => $profileUrl,
+                'display_name' => $displayName
+            ],
+            'posts' => $processedPosts
+        ];
 
-        // Speicherplatz-Bereinigung: Lösche Bilder aus dem Ordner, die auf Pixelfeed gelöscht wurden
+        if (!@file_put_contents($this->metaFile, json_encode($outputData, JSON_PRETTY_PRINT))) {
+            error_log("PixelFetch Error: Schreiben der Meta-Datei fehlgeschlagen: " . $this->metaFile);
+        }
+
         $this->purgeOrphanedImages($activeImageFiles);
     }
 
-    /**
-     * Entfernt ungenutzte Bilddateien aus dem lokalen Speicher
-     */
     private function purgeOrphanedImages(array $activeFiles): void
     {
         if (!is_dir($this->imageDir)) {
@@ -137,6 +149,8 @@ class CacheManager
         }
 
         $files = scandir($this->imageDir);
+        if ($files === false) return;
+
         foreach ($files as $file) {
             if ($file === '.' || $file === '..') {
                 continue;
