@@ -13,6 +13,10 @@
 
 PixelFetch ist eine minimalistische, extrem ressourcensparende und zu 100% datenschutzkonforme Multi-Account-Galerie für Pixelfed. Das Skript nutzt ein automatisiertes **Lazy Caching Verfahren** und läuft sowohl auf klassischem Webspace (wie All-Inkl.com) als auch containerisiert in Docker-Umgebungen.
 
+<div align="center">
+<img src=".view/view-1.png" height="200">
+</div>
+
 ## Features
 
 - **Multi-Account:** Verwalte unbegrenzt viele Pixelfed-Accounts (auch von unterschiedlichen Instanzen) über eine zentrale Installation.
