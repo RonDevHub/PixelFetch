@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://commitcloud.net/RonDevHub/PixelFetch/raw/commit/84e81193383f76582b52df0b7d4a5199e6d2c1bf/public/assets/logo/Pixelfetch-1.png" height="100">
+  <img src="public/assets/logo/Pixelfetch-1.png" height="100">
 </h1>
 <div align="center">
 
