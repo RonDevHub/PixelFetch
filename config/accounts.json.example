@@ -3,7 +3,7 @@
     "instance": "https://pixelfed.de",
     "token": "pf_at_abcdef1234567890abcdef...",
     "cache_ttl": 1800,
-    "max_pictures": 6, #Anzahl der maximalen Bilder
+    "max_pictures": 6,
     "theme_mode": "auto"
   },
   "jocker": {
