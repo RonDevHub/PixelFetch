@@ -1,4 +1,4 @@
-FROM php:8.2-apache-alpine
+FROM alpine:3.19
 
 # Systemabhängigkeiten installieren und curl für API-Abrufe absichern
 RUN apk add --no-cache curl \
