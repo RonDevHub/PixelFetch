@@ -1,0 +1,12 @@
+{
+  "batman": {
+    "instance": "https://pixelfeed.de",
+    "token": "pf_at_abcdef1234567890abcdef...",
+    "cache_ttl": 1800
+  },
+  "jocker": {
+    "instance": "https://pixelfeed.social",
+    "token": "pf_at_9876543210fedcba98765...",
+    "cache_ttl": 3600
+  }
+}
