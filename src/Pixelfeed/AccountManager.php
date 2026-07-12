@@ -2,7 +2,6 @@
 
 namespace PixelFetch\Pixelfeed;
 
-use PixelFetch\Core\Config;
 use PixelFetch\Core\HttpClient;
 
 class AccountManager
@@ -30,11 +29,13 @@ class AccountManager
         $accountDataJson = HttpClient::get($lookupUrl, $token);
 
         if (!$accountDataJson) {
+            error_log("PixelFetch Error: Lookup fehlgeschlagen für URL: " . $lookupUrl);
             return null;
         }
 
         $accountData = json_decode($accountDataJson, true);
-        if (!isset($accountData['id'])) {
+        if (!is_array($accountData) || !isset($accountData['id'])) {
+            error_log("PixelFetch Error: Ungültige Lookup-Antwort für User " . $username);
             return null;
         }
 
@@ -45,9 +46,16 @@ class AccountManager
         $statusesJson = HttpClient::get($statusesUrl, $token);
 
         if (!$statusesJson) {
+            error_log("PixelFetch Error: Status-Abruf fehlgeschlagen für URL: " . $statusesUrl);
             return null;
         }
 
-        return json_decode($statusesJson, true);
+        $statuses = json_decode($statusesJson, true);
+        if (!is_array($statuses)) {
+            error_log("PixelFetch Error: Statuses JSON konnte nicht dekodiert werden.");
+            return null;
+        }
+
+        return $statuses;
     }
 }
