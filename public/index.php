@@ -37,6 +37,7 @@ if (!file_exists($accountsPath)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PixelFetch - Setup & Galerie-Vorschau</title>
+    <link rel="icon" type="image/png" href="assets/logo/Pixelfetch-icon.png">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
